@@ -1,0 +1,45 @@
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+
+- url: /public
+  static_dir: public
+
+- url: /api/v(.?)/(archery_org_hk_spider).*
+  script: handlers.\2.app
+
+- url: /.*
+  script: views.index.app
+
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+- name: lxml
+  version: latest
+
+
+skip_files:
+
+- ^(.*/)?.*/assets/.*$
+- ^(.*/)?.*/build/.*$
+- ^(.*/)?.*/test/.*$
+- ^(.*/)?.*/templates/.*$
+- ^(.*/)?.*/node_modules/.*$
+
+- ^(assets/.*)
+- ^(build/.*)
+- ^(test/.*)
+- ^(templates/.*)
+- ^(node_modules/.*)
+
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.DS_Store$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$

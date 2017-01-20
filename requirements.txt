@@ -1,0 +1,4 @@
+validate_email
+PyJWT
+GoogleAppEngineCloudStorageClient
+lxml==2.3.5
