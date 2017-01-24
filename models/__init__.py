@@ -1,9 +1,28 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from google.appengine.ext import ndb
 
-class BaseModel(ndb.Model):
+class ToDict(ndb.Model):
+
+    FOR_PUBLIC = 10
+    FOR_OWNER = 50
+    FOR_ADMIN = 100
+
+    def to_dict_by_level(self, level):
+        return self.to_dict()
+    def to_dict_for_public(self):
+        return self.to_dict_by_level(ToDict.FOR_PUBLIC)
+    def to_dict_for_owner(self):
+        return self.to_dict_by_level(ToDict.FOR_OWNER)
+    def to_dict_for_admin(self):
+        return self.to_dict_by_level(ToDict.FOR_ADMIN)
+
+
+
+class BaseModel(ToDict):
     create_time = ndb.DateTimeProperty(auto_now_add=True)
     update_time = ndb.DateTimeProperty(auto_now=True)
-    mark_deleted = ndb.BooleanProperty(default=False)
+    deleted = ndb.BooleanProperty(default=False)
 
     @classmethod
     def create(cls, create_dict):
@@ -20,12 +39,7 @@ class BaseModel(ndb.Model):
 
     def delete(self, is_mark_deleted=True):
         if is_mark_deleted:
-            self.mark_deleted = True
+            self.deleted = True
+            self.put()
         else:
             self.key.delete()
-
-    def to_dict(self, include=None, exclude=None):
-        d = super(BaseModel, self).to_dict(include=include, exclude=exclude)
-        d['uid'] = self.key.id()
-        del d['mark_deleted']
-        return d

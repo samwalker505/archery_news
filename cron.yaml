@@ -1,0 +1,4 @@
+cron:
+- description: get post from HKAA
+  url: /api/v1/cron_jobs/archery_org_hk_spider
+  schedule: every 12 hours

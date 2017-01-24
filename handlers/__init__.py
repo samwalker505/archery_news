@@ -6,23 +6,30 @@ import json
 
 from common.json_encoder import JSONEncoder
 import common.config as config
+from models import ToDict
+
 class Output(object):
     @staticmethod
-    def json(func):
-        def func_wrapper(self, *args, **kwargs):
-            result = func(self, *args, **kwargs)
-            self.response.headers['Content-Type'] = 'application/json'
-            if isinstance(result, dict):
-                content = json.dumps(result, cls=JSONEncoder)
-                self.response.set_status(200)
-                self.response.write(content)
-            else:
-                logging.error('result is not dict')
-                self.response.set_status(400)
-                self.response.write(json.dumps({'error': 'check log la'}, cls=JSONEncoder))
-        return func_wrapper
+    def json(response_type='object'):
+        def _json(func):
+            def _output_json_func_wrapper(self, *args, **kwargs):
+                result = func(self, *args, **kwargs)
+                self.response.headers['Content-Type'] = 'application/json'
+                if isinstance(result, dict):
 
+                    if response_type == 'array':
+                        if 'results' in result:
+                            result['num_of_results'] = len(result['results'])
 
+                    content = json.dumps(result, cls=JSONEncoder)
+                    self.response.set_status(200)
+                    self.response.write(content)
+                else:
+                    logging.error('result is not dict')
+                    self.response.set_status(400)
+                    self.response.write(json.dumps({'error': 'check log la'}, cls=JSONEncoder))
+            return _output_json_func_wrapper
+        return _json
 
 class BaseHandler(webapp2.RequestHandler):
 
@@ -30,21 +37,25 @@ class BaseHandler(webapp2.RequestHandler):
         self.json_body = {}
         self.initialize(request, response)
 
-    def query(self, kls, per_page=1000, filters=[]):
+    def query(self, kls, per_page=1000, filters=None, order=None, level=ToDict.FOR_PUBLIC):
         from google.appengine.datastore.datastore_query import Cursor
         cursor = Cursor.from_websafe_string(str(self.request.get('cursor')))
         query = kls.query()
-        if filters:
-            logging.debug('filters: {}'.format(filters))
-            for f in filters:
-                query.filter(f)
+        if filters is None:
+            filters = []
+        if order is None:
+            order = -kls.create_time
+        logging.debug('filters: {}'.format(filters))
+        for f in filters:
+            query.filter(f)
+
+        query.order(order)
 
         results, next_cursor, more = query.fetch_page(per_page, start_cursor=cursor)
         result = {
             'cursor': next_cursor,
-            'results': [result.to_dict() for result in results],
-            'count': query.count(),
-            'more': more
+            'results': [result.to_dict_by_level(level) for result in results],
+            'more': more,
         }
 
         return result
