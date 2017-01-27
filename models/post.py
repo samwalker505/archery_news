@@ -5,6 +5,7 @@ import logging
 from models import BaseModel
 from google.appengine.ext.ndb import polymodel
 class Post(polymodel.PolyModel, BaseModel):
+    title = ndb.StringProperty()
     url = ndb.StringProperty()
     content = ndb.TextProperty()
     tags = ndb.StringProperty(repeated=True)
