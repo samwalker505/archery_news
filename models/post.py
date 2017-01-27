@@ -32,7 +32,7 @@ class Post(polymodel.PolyModel, BaseModel):
 
     def _update(self, params):
         update_dict = {}
-        keys = ['url', 'content', 'content_hash', 'url_hash']
+        keys = ['url', 'content', 'content_hash', 'url_hash', 'title']
         for key in keys:
             if key in params:
                 update_dict[key] = params[key]
