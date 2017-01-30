@@ -10,12 +10,14 @@ handlers:
 - url: /api/v(.)/cron_jobs/(archery_org_hk_spider)
   script: cron_jobs.\2.app
 
-- url: /api/v(.)/(test).*
+- url: /api/v(.)/(test)
   script: handlers.\2.app
+
+- url: /archery_org_hk.*
+  script: views.archery_org_hk.app
 
 - url: /.*
   script: views.index.app
-
 
 libraries:
 - name: webapp2

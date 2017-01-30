@@ -24,6 +24,9 @@ class BaseView(webapp2.RequestHandler):
         self.values = {}
         self.initialize(request, response)
 
+    def post(self, *args, **kwargs):
+        return self.get(*args, **kwargs)
+
     def render(self, *args, **kwargs):
         pass
 

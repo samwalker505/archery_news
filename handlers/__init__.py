@@ -10,26 +10,22 @@ from models import ToDict
 
 class Output(object):
     @staticmethod
-    def json(response_type='object'):
-        def _json(func):
-            def _output_json_func_wrapper(self, *args, **kwargs):
-                result = func(self, *args, **kwargs)
-                self.response.headers['Content-Type'] = 'application/json'
-                if isinstance(result, dict):
-
-                    if response_type == 'array':
-                        if 'results' in result:
-                            result['num_of_results'] = len(result['results'])
-
-                    content = json.dumps(result, cls=JSONEncoder)
-                    self.response.set_status(200)
-                    self.response.write(content)
-                else:
-                    logging.error('result is not dict')
-                    self.response.set_status(400)
-                    self.response.write(json.dumps({'error': 'check log la'}, cls=JSONEncoder))
-            return _output_json_func_wrapper
-        return _json
+    def json(func):
+        def _output_json_func_wrapper(self, *args, **kwargs):
+            logging.debug('output format: json')
+            result = func(self, *args, **kwargs)
+            self.response.headers['Content-Type'] = 'application/json'
+            if isinstance(result, dict):
+                if 'results' in result:
+                    result['num_of_results'] = len(result['results'])
+                content = json.dumps(result, cls=JSONEncoder)
+                self.response.set_status(200)
+                self.response.write(content)
+            else:
+                logging.error('result is not dict')
+                self.response.set_status(400)
+                self.response.write(json.dumps({'error': 'check log la'}, cls=JSONEncoder))
+        return _output_json_func_wrapper
 
 class BaseHandler(webapp2.RequestHandler):
 
