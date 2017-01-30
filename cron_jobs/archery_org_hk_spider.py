@@ -9,8 +9,27 @@ import logging
 from lxml import etree
 from handlers import BaseHandler, Output
 from models.post import ArcheryOrgHkPost
+from external_api.facebook import Facebook as FacebookApi
 
 class ArcheryOrgHkSpiderHandler(BaseHandler):
+
+    def create_post(self, post, client):
+        post_content = []
+        title = post.title or ''
+        content = post.content.replace('\n', '%0A') or ''
+        tag_arr = [u'%23{}'.format(tag) for tag in post.tags]
+        tags = u'%20'.join(tag_arr)
+        if title:
+            post_content.append(title)
+        if content:
+            post_content.append(content)
+        if tags:
+            post_content.append(tags)
+        post_fb_content = u'%0A'.join(post_content)
+        logging.debug('entered')
+        logging.debug(post_fb_content)
+        link = '{}/archery_org_hk?post_id={}'.format(self.request.host_url, post.key.id())
+        result = client.create_post(post_fb_content, link)
 
     @Output.json
     def get(self, *args, **kwargs):
@@ -55,8 +74,14 @@ class ArcheryOrgHkSpiderHandler(BaseHandler):
         keys = [ndb.Key(ArcheryOrgHkPost, str(rid)) for rid in result_ids]
         created_posts = ndb.get_multi(keys)
         to_create = [r for r, p in zip(results, created_posts) if not p]
-        posts = ArcheryOrgHkPost.create_from_spider_batch(to_create)
-
+        if to_create:
+            created_post_keys = ArcheryOrgHkPost.create_from_spider_batch(to_create)
+            created_posts = ndb.get(created_post_keys)
+            client = FacebookApi()
+            for post in created_posts:
+                self.create_post(post, client)
+        else:
+            logging.debug('no to create')
         return {}
 
 app = webapp2.WSGIApplication([

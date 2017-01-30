@@ -33,6 +33,5 @@ class Facebook(ExternalBase):
             endpoint = u'{}/feed?message={}&link={}'.format(self.post_id, content, link)
         else:
             endpoint = u'{}/feed?message={}'.format(self.post_id, content)
-        endpoint.encode('utf-8')
-
+        logging.debug(u'endpoints: {}'.format(endpoint))
         return self.post(endpoint)
