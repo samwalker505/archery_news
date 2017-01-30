@@ -21,12 +21,18 @@ class Facebook(ExternalBase):
         url = u'{}/{}'.format(self.base_url, url)
         logging.debug(u'post: {}'.format(url))
         headers = {'Authorization': 'OAuth {}'.format(self.access_token)}
+        logging.debug(headers)
         return urlfetch.fetch(
             url=url,
             payload=payload,
             method=urlfetch.POST,
             headers=headers)
 
-    def create_post(self, content):
-        endpoint = u'{}/feed?message={}'.format(self.post_id, content)
+    def create_post(self, content, link=None):
+        if link:
+            endpoint = u'{}/feed?message={}&link={}'.format(self.post_id, content, link)
+        else:
+            endpoint = u'{}/feed?message={}'.format(self.post_id, content)
+        endpoint.encode('utf-8')
+
         return self.post(endpoint)

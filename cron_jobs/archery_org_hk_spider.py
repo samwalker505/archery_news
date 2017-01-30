@@ -12,7 +12,7 @@ from models.post import ArcheryOrgHkPost
 
 class ArcheryOrgHkSpiderHandler(BaseHandler):
 
-    @Output.json(response_type='array')
+    @Output.json
     def get(self, *args, **kwargs):
         pageNum = 0
         url_format = 'https://www.archery.org.hk/frontpage?page={}'
@@ -57,7 +57,7 @@ class ArcheryOrgHkSpiderHandler(BaseHandler):
         to_create = [r for r, p in zip(results, created_posts) if not p]
         posts = ArcheryOrgHkPost.create_from_spider_batch(to_create)
 
-        return {'results': [post.to_dict_for_owner() for post in posts]}
+        return {}
 
 app = webapp2.WSGIApplication([
     (r'/api/v1/cron_jobs/archery_org_hk_spider', ArcheryOrgHkSpiderHandler),
