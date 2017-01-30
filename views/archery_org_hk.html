@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta property="og:title" content="{{post.title}}" />
+    <meta property="og:title" content="{{post.title||post.content}}" />
     <meta property="og:type" content="article" />
-    <meta property="og:image" content="/public/img/archery_org_hk_cap.ong" />
-    <title>{{post.title}}</title>
+    <meta property="og:image" content="{{host_url}}/public/img/archery_org_hk_cap.ong" />
+    <title>{{post.title || post.content}}</title>
   </head>
   <body>
     <div id="app">

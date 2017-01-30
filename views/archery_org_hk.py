@@ -14,6 +14,7 @@ class ArcheryOrgHk(BaseView):
             post = ArcheryOrgHkPost.get_by_id(post_id)
             if post:
                 self.values['post'] = post
+                self.values['host_url'] = self.request.host_url
             else:
                 raise Exception(NOT_FOUND)
         else:
