@@ -98,8 +98,8 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# secret
-secret.py
+# keys
+keys/
 
 # vue
 .DS_Store
